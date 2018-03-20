@@ -3,19 +3,24 @@
 % By Gianluca Detommaso - 15/03/2018
 %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~%
 
-function x = SVGD_FI(N, stepsize, timemax, model, prior, obs)
+function x = SVGD_FI(x, stepsize, itermax, timemax, model, prior, obs)
 
 % Initialise clock
 tic;
 
-% Initial particle configurations
-x = prior.m0 + prior.C0sqrt*randn(model.n,N);
+% Number of particles
+N = size(x,2);
 
 % Initialise particle maximum shifts
 maxshift        = zeros(N,1);
 maxmaxshift_old = inf;
 
-while toc <= timemax
+for k = 1:itermax
+    
+    % Stop if over maximum time
+    if toc > timemax
+        break
+    end
     
     % Calculate gradient and Gauss-Newton Hessian of the posterior for each particle
     g_mlpt = zeros(model.n, N);
@@ -78,5 +83,9 @@ while toc <= timemax
         stepsize = 1.01*stepsize;
     end
     maxmaxshift_old = maxmaxshift;
-
+    
+    % Last iteration
+    if k == itermax
+       fprintf('Maximum number of iterations has been reached.\n') 
+    end
 end

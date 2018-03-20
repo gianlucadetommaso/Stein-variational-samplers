@@ -3,19 +3,24 @@
 % By Gianluca Detommaso -- 15/03/2018
 %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~%
 
-function x = SVQN_I(N, stepsize, timemax, model, prior, obs)
+function x = SVQN_I(x, stepsize, itermax, timemax, model, prior, obs)
 
 % Initialise clock
 tic;
 
-% Initial particle configurations
-x = prior.m0 + prior.C0sqrt*randn(model.n,N);
+% Number of particles
+N = size(x,2);
 
 % Initialise particle maximum shifts
 maxshift        = zeros(N,1);
 maxmaxshift_old = inf;
 
-while toc <= timemax
+for k = 1:itermax
+    
+    % Stop if over maximum time
+    if toc > timemax
+        break
+    end
     
     if N > 1    % If more than one particle
 
@@ -99,5 +104,9 @@ while toc <= timemax
         stepsize = 1.01*stepsize;
     end
     maxmaxshift_old = maxmaxshift;
-
+    
+    % Last iteration
+    if k == itermax
+       fprintf('Maximum number of iterations has been reached.\n') 
+    end
 end
