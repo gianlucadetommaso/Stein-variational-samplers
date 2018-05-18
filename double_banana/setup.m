@@ -1,6 +1,6 @@
 %% Double banana setup
 %
-% By Gianluca Detommaso -- 14/03/2018
+% By Gianluca Detommaso -- 18/05/2018
 %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~%
 
 %% Model         
@@ -39,6 +39,6 @@ obs.std2    = obs.std^2;
 % Noise
 obs.noise   = obs.std*randn(model.m, obs.nobs); 
 % Real parameter vector
-obs.u_true  = rand(model.n);
+obs.u_true  = rand(model.n,1);
 % Observations
 obs.y       = forward_solve(obs.u_true, model) + obs.noise;

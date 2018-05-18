@@ -1,6 +1,6 @@
-%% Gradient of minus log-posterior
+%% Gradient of negative log-posterior
 %
-% By Gianluca Detommaso -- 15/03/2018
+% By Gianluca Detommaso -- 18/05/2018
 %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~%
 
 function g_mlpt = grad_mlpt(x, Fx, model, prior, obs)

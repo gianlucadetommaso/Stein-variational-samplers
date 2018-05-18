@@ -1,6 +1,6 @@
 %% Jacobian of the forward operator
 %
-% By Gianluca Detommaso -- 15/03/2018
+% By Gianluca Detommaso -- 18/05/2018
 %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~%
 
 function J = dFdx(x, model)
@@ -17,7 +17,7 @@ function J = dFdx(x, model)
         xminus    = x;
         xminus(j) = x(j) - 0.5*h;
         
-        % Calculate partial derivative
+        % Approximate partial derivative
         J(:,j)  = ( forward_solve(xplus, model) - forward_solve(xminus, model) ) / h;
 
     end
