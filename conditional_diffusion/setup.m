@@ -1,6 +1,6 @@
 %% Conditional diffusion setup
 %
-% By Gianluca Detommaso -- 16/03/2018
+% By Gianluca Detommaso -- 18/05/2018
 %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~%
 
 %% Model         
@@ -25,7 +25,22 @@ model.t = model.h:model.h:model.T;
 model.beta = 10;
 
 % Forward map
-model.F = @(u) u(model.ratio:model.ratio:end);
+model.F = @(u) forward_solve(u, model);
+  
+% True x
+wn           = randn(model.n,1);
+model.x_true = [sqrt(model.h)*wn(1); zeros(model.n-1,1)];
+for j = 1:model.n-1
+    model.x_true(j+1) = model.x_true(j) + sqrt(model.h)*wn(j+1);
+end
+
+% Calculate true solution
+model.sol_true = [model.x_true(1); zeros(model.n-1, 1)];
+
+for j = 2:model.n
+    model.sol_true(j) = model.sol_true(j-1)*( 1 + model.beta*( 1-model.sol_true(j-1)^2 ) ...
+        / ( 1+model.sol_true(j-1)^2 ) * model.h ) + (model.x_true(j) - model.x_true(j-1));   
+end
 
 
 %% Prior
@@ -44,6 +59,7 @@ prior.C0sqrt  = real(sqrtm(prior.C0));
 % Square root of prior precision matrix
 prior.C0isqrt = real(sqrtm(prior.C0i));
 
+
 %% Observation
 
 % Number of independent observations
@@ -55,22 +71,7 @@ obs.std2    = obs.std^2;
 % Noise
 obs.noise   = obs.std*randn(model.m, obs.nobs); 
 
-% Underlying white noise
-wn = sqrt(model.t).*randn(model.n,1);  
-% Find real u
-obs.u_true = [wn(1); zeros(model.n-1,1)];
-for j = 1:model.n-1
-    obs.u_true(j+1) = obs.u_true(j)*( 1 + model.beta*( 1-obs.u_true(j)^2 ) / ( 1+obs.u_true(j)^2 ) * model.h ) + wn(j+1);
-end
-
-% Find real u
-wn = sqrt(model.t).*randn(model.n,1);  
-obs.u_true = [wn(1); zeros(model.n-1,1)];
-for j = 1:model.n-1
-    obs.u_true(j+1) = obs.u_true(j)*( 1 + model.beta*( 1-obs.u_true(j)^2 ) / ( 1+obs.u_true(j)^2 ) * model.h ) + wn(j+1);
-end
-
 % Observations
-obs.y = forward_solve(obs.u_true , model) + obs.noise;
+obs.y = forward_solve(model.x_true , model) + obs.noise;
 % Observation times
-obs.y_tt = model.t(model.ratio:model.ratio:end);
+obs.t = model.t(model.ratio:model.ratio:end);
