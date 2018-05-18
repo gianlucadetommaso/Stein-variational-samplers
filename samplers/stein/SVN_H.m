@@ -1,4 +1,4 @@
-%% Stein Variational Newton with Hessian kernel
+%% Stein Variational Newton with scaled Hessian kernel
 %
 % By Gianluca Detommaso - 18/05/2018
 %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~%

@@ -1,4 +1,4 @@
-%% Stein Variational Gradient Descent with Hessian kernel
+%% Stein Variational Gradient Descent with scaled Hessian kernel
 %
 % By Gianluca Detommaso - 18/05/2018
 %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~%
