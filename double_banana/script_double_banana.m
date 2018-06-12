@@ -53,7 +53,7 @@ x2 = -2.1:.05:3;
 post_pdf = post2contour([X1(:) X2(:)]', model, prior, obs);
 post_pdf = reshape(post_pdf, length(x2), length(x1));
 
-% Traceplots figure
+% Figure
 figure('name', '2D double banana')
 
 
