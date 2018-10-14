@@ -36,13 +36,10 @@ for k = 1:itermax
     % Scaled averaging Hessian approximation
     sEH = mean(gnH,3) / model.N;
     
-    % Copy variable for parfor slicing issues
-    w_copy = w;
-    
-    parfor i = 1:npart
+    for i = 1:npart
         
         % Calculate signed difference matrix
-        sign_diff = w(:,i) - w_copy;
+        sign_diff = w(:,i) - w;
 
         % Calculate kernel
         kern = exp( -0.5 * sum( sign_diff' * sEH .* sign_diff', 2 ) )';
@@ -54,11 +51,11 @@ for k = 1:itermax
         mgrad_J = mean( -kern .* g_mlpt + g_kern, 2 ); 
         
         % Hessian of the map
-        H_J = mean( permute( repmat( kern, [model.N 1 model.N]), [1 3 2] ) .* gnH , 3 ) ...
-                + sEH*mean(kern);
-         
-        % Search direction
-        Q = H_J \ mgrad_J; 
+        H_J = mean( permute( repmat( kern.^2, [model.n 1 model.n]), [1 3 2] ) ...
+                             .* gnH , 3 ) + g_kern * g_kern' / N;  
+                
+        % Newton direction
+        Q = H_J \ mgrad_J;
         
         % Update the particle
         w(:,i) = w(:,i) + stepsize*Q;
