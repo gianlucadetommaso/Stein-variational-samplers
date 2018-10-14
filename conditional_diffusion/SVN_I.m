@@ -55,13 +55,10 @@ for k = 1:itermax
     % Calculate kernel
     kern = exp(-h_inv*dist2);
     
-    % Copy variable for parfor slicing issues
-    w_copy = w;
-    
-    parfor i = 1:npart
+    for i = 1:npart
         
         % Calculate signed difference matrix
-        sign_diff = w(:,i) - w_copy;
+        sign_diff = w(:,i) - w;
 
         % Gradient of kernel
         g_kern = 2*h_inv*kern(i,:) .* sign_diff;
@@ -70,11 +67,11 @@ for k = 1:itermax
         mgrad_J = mean( -kern(i,:) .* g_mlpt + g_kern, 2 );  
                 
         % Hessian of the map
-        H_J = mean( permute( repmat( kern(i,:), [model.N 1 model.N]), [1 3 2] ) .* gnH , 3 ) ...
-                + h_inv*I*mean(kern(i,:));
-          
-        % Search direction
-        Q = H_J \ mgrad_J; 
+        H_J = mean( permute( repmat( kern(i,:).^2, [model.n 1 model.n]), [1 3 2] ) ...
+                             .* gnH , 3 ) + g_kern * g_kern' / N;  
+                
+        % Newton direction
+        Q = H_J \ mgrad_J;
         
         % Update the particle
         w(:,i) = w(:,i) + stepsize*Q;
