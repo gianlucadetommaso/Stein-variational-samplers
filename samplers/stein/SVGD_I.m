@@ -41,7 +41,7 @@ for k = 1:itermax
     % Calculate gradient of the posterior for each particle
     g_mlpt = zeros(model.n, N);
     
-    parfor j = 1:N
+    for j = 1:N
         [Fx, J]     = forward_solve(x(:,j), model);
         g_mlpt(:,j) = grad_mlpt(x(:,j), Fx, J, prior, obs);
     end
@@ -49,13 +49,10 @@ for k = 1:itermax
     % Calculate kernel
     kern = exp(-h_inv*dist2);
     
-    % Copy variable for parfor slicing issues
-    x_copy = x;
-    
-    parfor i = 1:N
+    for i = 1:N
         
         % Calculate signed difference matrix
-        sign_diff = x(:,i) - x_copy;
+        sign_diff = x(:,i) - x;
 
         % Gradient of kernel
         g_kern = 2*h_inv*kern(i,:) .* sign_diff;

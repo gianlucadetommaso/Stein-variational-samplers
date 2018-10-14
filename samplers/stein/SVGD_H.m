@@ -23,7 +23,7 @@ for k = 1:itermax
     g_mlpt = zeros(model.n, N);
     gnH    = zeros(model.n, model.n, N);
     
-    parfor j = 1:N
+    for j = 1:N
         [Fx, J]     = forward_solve(x(:,j), model);
         g_mlpt(:,j) = grad_mlpt(x(:,j), Fx, J, prior, obs);
         gnH(:,:,j)  = prior.C0i + J'*J / obs.std2;   
@@ -32,13 +32,10 @@ for k = 1:itermax
     % Scaled averaging Hessian approximation
     sEH = mean(gnH,3) / model.n;
     
-    % Copy variable for parfor slicing issues
-    x_copy = x;
-    
     for i = 1:N
         
         % Calculate signed difference matrix
-        sign_diff = x(:,i) - x_copy;
+        sign_diff = x(:,i) - x;
 
         % Calculate kernel
         kern = exp( -0.5 * sum( sign_diff' * sEH .* sign_diff', 2 ) )';

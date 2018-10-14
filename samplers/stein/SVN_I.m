@@ -9,14 +9,10 @@ function [x, stepsize, timeave] = SVN_I(x, stepsize, itermax, model, prior, obs)
 N = size(x,2);
 
 % Initialise particle maximum shifts
-maxshift        = zeros(N,1);
 maxmaxshift_old = inf;
 
 % Initialise average computational time
 timeave = 0;
-
-% Identity matrix
-I = eye(model.n);
 
 for k = 1:itermax
 
@@ -41,28 +37,26 @@ for k = 1:itermax
         h_inv = 1;
     end 
     
-    % Calculate gradient and Gauss-Newton Hessian of the posterior for each particle
+    % Calculate gradient and Gauss-Newton Hessian of the posterior for each particle  
     g_mlpt = zeros(model.n, N);
+    gnH    = zeros(model.n, model.n, N);
     
-    parfor j = 1:N
+    for j = 1:N
         [Fx, J]     = forward_solve(x(:,j), model);
         g_mlpt(:,j) = grad_mlpt(x(:,j), Fx, J, prior, obs);
         gnH(:,:,j)  = prior.C0i + J'*J / obs.std2;   
     end
     
-    % Averaging Hessian approximation
-    EH = mean(gnH, 3);
-    
     % Calculate kernel
     kern = exp(-h_inv*dist2);
     
-    % Copy variable for parfor slicing issues
-    x_copy = x;
+    % Initialise matrix of coefficients
+    alpha = zeros(model.n, N);
     
-    parfor i = 1:N
+    for i = 1:N
         
         % Calculate signed difference matrix
-        sign_diff = x(:,i) - x_copy;
+        sign_diff = x(:,i) - x;
 
         % Gradient of kernel
         g_kern = 2*h_inv*kern(i,:) .* sign_diff;
@@ -71,22 +65,21 @@ for k = 1:itermax
         mgrad_J = mean( -kern(i,:) .* g_mlpt + g_kern, 2 );  
                 
         % Hessian of the map
-        H_J = mean( permute( repmat( kern(i,:), [model.n 1 model.n]), [1 3 2] ) .* gnH , 3 ) ...
-                + h_inv*I*mean(kern(i,:));
-          
-        % Search direction
-        Q = H_J \ mgrad_J; 
-        
-        % Update the particle
-        x(:,i) = x(:,i) + stepsize*Q;
-        
-        % Particle maximum shift
-        maxshift(i) = norm(Q, inf);
+        H_J = mean( permute( repmat( kern(i,:).^2, [model.n 1 model.n]), [1 3 2] ) ...
+                             .* gnH , 3 ) + g_kern * g_kern' / N;  
 
+        % Newton direction
+        alpha(:,i) = H_J \ mgrad_J;
     end
-  
+    
+    % Find update directions
+    Q = alpha;  % due to block-diagonal approximation
+    
+    % Update particles
+    x = x + stepsize*Q;
+    
     % Maximum shift over all the particles
-    maxmaxshift = max(maxshift);
+    maxmaxshift = max( Q(:) ); 
     fprintf('Maximum shift is %f\n', maxmaxshift)
     
     % Rescale stepsize and reset particles if maximum shift is too large
