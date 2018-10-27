@@ -1,6 +1,9 @@
 # Stein-Variational-samplers
-https://arxiv.org/abs/1806.03085
+https://arxiv.org/abs/1806.03085 -- NIPS 2018
+MATLAB code for a Stein Variational Newton method and comparisons with Stein Variational Gradient Descent.
 
-MATLAB code for Stein Variational Newton method and comparisons with Stein Variational Gradient Descent.
-
-To run a test case, just go in the correspondent folder and run the script file. The double banana test case is a two-dimensional test case with an interesting geometry. The conditional diffusion example is a 100-dimensional SDE inverse problem of reconstructing a Brownian path. The latter exploits the toolbox in the fastfins (Fast Forward and Inverse Solver) folder, developed by Tiangang Cui (Monash University, Melbourne, AU).
+Test cases:
+- Double banana -- two-dimensional, multi-modal banana shaped.
+- Non-linear regression -- two-dimension, skewed shaped.
+- Conditional diffusion -- 100 dimensional, Brownian path reconstruction out of noisy observations of the solution of a Langevin stochastic   differential equation.
+- Bayesian Neural Network -- 2951 dimensional on a real data-set with 308 data points.
