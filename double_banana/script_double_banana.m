@@ -3,12 +3,6 @@
 % By Gianluca Detommaso 18/05/2018
 %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-% Turn on parallel pool if not on already
-pool = gcp('nocreate');
-if isempty(pool)
-    parpool;
-end
-
 % Set random seed
 rng(1);
 
@@ -25,11 +19,11 @@ N = 1e3;
 x_init = prior.m0 + prior.C0sqrt*randn(model.n,N);  
 
 % Number of iterations
-itermax = 100;
+itermax = 10;
 
 % Estimate computational time
 stepsize = 1;
-[~, ~, t_NH]  = SVN_H(x_init, stepsize, itermax, model, prior, obs);
+[x, ~, t_NH]  = SVN_H(x_init, stepsize, itermax, model, prior, obs);
 
 stepsize = 1;
 [~, ~, t_NI]  = SVN_I(x_init, stepsize, itermax, model, prior, obs);
