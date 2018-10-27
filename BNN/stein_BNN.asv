@@ -1,0 +1,106 @@
+%% Stein BNN
+%
+% Gianluca Detommaso -- 09/08/2018
+%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+% Set random seed
+rng(1);
+
+% Set up the model
+setup;
+
+vys = data.validate_ys * data.std(data.y_indices) + data.min(data.y_indices);
+
+figure('name', 'MAP prediction')
+tmpMAP = NN_model_fast(model, data.validate_xs, model.map_l);
+preMAP = tmpMAP.zs{end} * data.std(data.y_indices) + data.min(data.y_indices); 
+
+plot(preMAP,'o'), hold on,
+plot(vys, '.')
+legend('prediction', 'validation data')
+xlabel('element of the validation set')
+ylabel('trasformed labels')
+
+figure
+plot(preMAP - vys, )
+legend('prediction', 'cross-validation data')
+xlabel('element of the validation set')
+ylabel('error')
+
+% Number of particles
+N = 30;
+
+% Initial particle configuration
+x_init = model.map_l + [randn(model.n-2,N); repmat([model.log_gamma; model.log_lambda], 1, N)];  
+
+%% Estimate computational time
+% Number of iterations
+itermax = 10;
+
+stepsizeH = 1;
+[~, ~, tH] = SVN_CG_blockdiag(x_init, stepsizeH, itermax, model, data);
+
+stepsizeI = 1;
+[~, ~, tI] = SVGD_I(x_init, stepsizeI, itermax, model, data);
+
+% Time ratios wrt SVN_H-CG-blockdiag
+rI = tH / tI;
+
+
+%% Compare the algorithms
+
+preI = zeros(size(data.validate_ys, 2), N);
+preH = zeros(size(data.validate_ys, 2), N);
+
+itermaxH = [10 20 30];
+itermaxdiffH = [itermaxH(1) diff(itermaxH)];
+itermaxI = ceil(rI * itermaxH);
+itermaxdiffI = [itermaxI(1) diff(itermaxI)];
+
+xH = x_init;
+xI = x_init;
+
+figure
+for j = 1:3
+
+    [xH, stepsizeH] = SVN_CG_blockdiag(xH, stepsizeH, itermaxdiffH(j), model, data);
+    [xI, stepsizeI] = SVGD_I(xI, stepsizeI, itermaxdiffI(j), model, data);
+    
+    for k = 1:N
+        % cross validation
+        tmpI = NN_model_fast(model, data.validate_xs, xI(:,k));
+        tmpH = NN_model_fast(model, data.validate_xs, xH(:,k));
+        preI(:,k) = tmpI.zs{end} * data.std(data.y_indices) + data.min(data.y_indices);   
+        preH(:,k) = tmpH.zs{end} * data.std(data.y_indices) + data.min(data.y_indices);
+    end
+
+    EpreH = mean(preH,2);
+    upboundH = quantile(preH,0.95,2);
+    lwboundH = quantile(preH,0.05,2);
+
+    EpreI = mean(preI,2);
+    upboundI = quantile(preI,0.95,2);
+    lwboundI = quantile(preI,0.05,2);
+
+    subplot(2,3,j), hold on
+    plot(EpreH - vys','r-'), hold on
+    idx = 1:length(upboundH);
+    f1 = fill([idx'; flipud(idx')], [lwboundH - vys'; flipud(upboundH - vys')], 'b'); hold on
+    set(f1,'facealpha',.1)
+    axis([1 length(idx) -0.1 0.1])
+    xlabel('index')
+    ylabel('error')
+    title(['SVN-H -- ' num2str(itermaxH(j)) ' iterations'])
+    
+    subplot(2,3,3+j), hold on
+    plot(EpreI - vys','r-'), hold on
+    idx = 1:length(upboundI);
+    f1 = fill([idx'; flipud(idx')], [lwboundI - vys'; flipud(upboundI - vys')], 'b'); hold on
+    set(f1,'facealpha',.1)
+    axis([1 length(idx) -0.1 0.1])
+    xlabel('index')
+    ylabel('error')
+    title(['SVGD-I -- ' num2str(itermaxI(j)) ' iterations'])
+    
+
+end

@@ -3,12 +3,6 @@
 % By Gianluca Detommaso -- 8/06/2018
 %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-% Turn on parallel pool if not on already
-pool = gcp('nocreate');
-if isempty(pool)
-    parpool;
-end
-
 % Set random seed
 rng(1);
 
@@ -19,7 +13,7 @@ load_dir
 plot_setup
 
 % Number of particles
-npart = 1e3;
+npart = 1e2;
 
 % Initial particle configuration
 w_init = randn(model.N, npart);  
@@ -59,8 +53,8 @@ sol_true = euler_solve(model.N, model.d, model.dt, model.true_w);
 %% Compare the algorithms with same total cost
 
 % SVN-H
-itermaw_NH     = [10 50 100];
-itermaxdiff_NH = [itermaw_NH(1) diff(itermaw_NH)];
+itermax_NH     = [10 50 100];
+itermaxdiff_NH = [itermax_NH(1) diff(itermax_NH)];
 stepsize_NH    = 1;  
 w_NH           = w_init;
 
@@ -93,8 +87,8 @@ end
 
 
 % SVN-I
-itermaw_NI     = ceil(r_NI*itermaw_NH);
-itermaxdiff_NI = [itermaw_NI(1) diff(itermaw_NI)];
+itermax_NI     = ceil(r_NI*itermaw_NH);
+itermaxdiff_NI = [itermax_NI(1) diff(itermax_NI)];
 stepsize_NI    = 1;  
 w_NI           = w_init;
 
@@ -122,12 +116,12 @@ for j = 1:3
     plot(tt_obs', obs.data, 'r.', 'markersize', 10)
     plot(tt', Eu, 'b-')
     grid on
-    title(['SVN-I -- ' num2str(floor(itermaw_NI(j))) ' iterations'])
+    title(['SVN-I -- ' num2str(floor(itermax_NI(j))) ' iterations'])
 end
 
 % SVGD-H
-itermaw_GDH     = ceil(r_GDH*itermaw_NH); 
-itermaxdiff_GDH = [itermaw_GDH(1) diff(itermaw_GDH)];
+itermax_GDH     = ceil(r_GDH*itermaw_NH); 
+itermaxdiff_GDH = [itermax_GDH(1) diff(itermax_GDH)];
 stepsize_GDH    = 1e-1;
 w_GDH           = w_init;
 
@@ -154,12 +148,12 @@ for j = 1:3
     plot(tt_obs', obs.data, 'r.', 'markersize', 10)
     plot(tt', Eu, 'b-')
     grid on
-    title(['SVGD-H -- ' num2str(floor(itermaw_GDH(j))) ' iterations'])
+    title(['SVGD-H -- ' num2str(floor(itermax_GDH(j))) ' iterations'])
 end
 
 % SVGD-I
-itermaw_GDI     = ceil(r_GDI*itermaw_NH); 
-itermaxdiff_GDI = [itermaw_GDI(1) diff(itermaw_GDI)];
+itermax_GDI     = ceil(r_GDI*itermaw_NH); 
+itermaxdiff_GDI = [itermax_GDI(1) diff(itermax_GDI)];
 stepsize_GDI    = 5*1e-3;
 w_GDI           = w_init;
 
@@ -187,7 +181,7 @@ for j = 1:3
     plot(tt_obs', obs.data, 'r.', 'markersize', 10)
     plot(tt', Eu, 'b-')
     grid on
-    title(['SVGD-I -- ' num2str(floor(itermaw_GDI(j))) ' iterations'])
+    title(['SVGD-I -- ' num2str(floor(itermax_GDI(j))) ' iterations'])
 end
 
 
