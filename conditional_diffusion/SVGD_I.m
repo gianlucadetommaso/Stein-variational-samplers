@@ -50,10 +50,13 @@ for k = 1:itermax
     % Calculate kernel
     kern = exp(-h_inv*dist2);
     
+    % Copy variable for parfor slicing issues
+    w_copy = w;
+    
     for i = 1:npart
         
         % Calculate signed difference matrix
-        sign_diff = w(:,i) - w;
+        sign_diff = w(:,i) - w_copy;
 
         % Gradient of kernel
         g_kern = 2*h_inv*kern(i,:) .* sign_diff;

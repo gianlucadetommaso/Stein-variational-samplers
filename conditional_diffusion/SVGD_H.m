@@ -36,10 +36,13 @@ for k = 1:itermax
     % Scaled averaging Hessian approximation
     sEH = mean(gnH,3) / model.N;
     
+    % Copy variable for parfor slicing issues
+    w_copy = w;
+    
     for i = 1:npart
         
         % Calculate signed difference matrix
-        sign_diff = w(:,i) - w;
+        sign_diff = w(:,i) - w_copy;
 
         % Calculate kernel
         kern = exp( -0.5 * sum( sign_diff' * sEH .* sign_diff', 2 ) )';

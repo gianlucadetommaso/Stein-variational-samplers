@@ -82,12 +82,12 @@ for j = 1:3
     plot(tt_obs', obs.data, 'r.', 'markersize', 10)
     plot(tt', Eu, 'b-')
     grid on
-    title(['SVN-H -- ' num2str(floor(itermaw_NH(j))) ' iterations'])
+    title(['SVN-H -- ' num2str(floor(itermax_NH(j))) ' iterations'])
 end
 
 
 % SVN-I
-itermax_NI     = ceil(r_NI*itermaw_NH);
+itermax_NI     = ceil(r_NI*itermax_NH);
 itermaxdiff_NI = [itermax_NI(1) diff(itermax_NI)];
 stepsize_NI    = 1;  
 w_NI           = w_init;
@@ -120,7 +120,7 @@ for j = 1:3
 end
 
 % SVGD-H
-itermax_GDH     = ceil(r_GDH*itermaw_NH); 
+itermax_GDH     = ceil(r_GDH*itermax_NH); 
 itermaxdiff_GDH = [itermax_GDH(1) diff(itermax_GDH)];
 stepsize_GDH    = 1e-1;
 w_GDH           = w_init;
@@ -152,7 +152,7 @@ for j = 1:3
 end
 
 % SVGD-I
-itermax_GDI     = ceil(r_GDI*itermaw_NH); 
+itermax_GDI     = ceil(r_GDI*itermax_NH); 
 itermaxdiff_GDI = [itermax_GDI(1) diff(itermax_GDI)];
 stepsize_GDI    = 5*1e-3;
 w_GDI           = w_init;
