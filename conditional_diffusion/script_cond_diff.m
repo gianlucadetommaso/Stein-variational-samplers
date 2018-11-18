@@ -13,7 +13,7 @@ load_dir
 plot_setup
 
 % Number of particles
-npart = 1e2;
+npart = 1e3;
 
 % Initial particle configuration
 w_init = randn(model.N, npart);  
@@ -145,6 +145,7 @@ for j = 1:3
     lwbound = quantile(sol_GDH,0.05,2);
     f1 = fill([tt'; flipud(tt')], [lwbound; flipud(upbound)], 'b'); hold on
     set(f1,'facealpha',.1)
+    plot(tt, sol_true, 'm-')
     plot(tt_obs', obs.data, 'r.', 'markersize', 10)
     plot(tt', Eu, 'b-')
     grid on
