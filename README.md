@@ -1,5 +1,5 @@
 # Stein-Variational-samplers
-https://arxiv.org/abs/1806.03085 -- NIPS 2018
+ArXiv: https://arxiv.org/abs/1806.03085 -- NIPS 2018
 
 MATLAB and Python code for Stein Variational Newton method and comparisons with Stein Variational Gradient Descent.
 
