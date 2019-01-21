@@ -1,10 +1,11 @@
-# Stein-Variational-samplers
-ArXiv: https://arxiv.org/abs/1806.03085 -- NIPS 2018
+#### Stein variational samplers
+This repository contains MATLAB and python code for several Stein variational sampling algorithms. 
 
-MATLAB and Python code for Stein Variational Newton method and comparisons with Stein Variational Gradient Descent.
+### MATLAB
+The directory "MATLAB" contains the test cases implemented in "A Stein variational Newton method" (SVN), https://arxiv.org/pdf/1806.03085.pdf (Detommaso et al., NIPS 2018).
 
-Test cases:
-- Double banana -- two-dimensional, multi-modal banana shaped.
-- Non-linear regression -- two-dimension, skewed shaped.
-- Conditional diffusion -- 100 dimensional, Brownian path reconstruction out of noisy observations of the solution of a Langevin stochastic   differential equation.
-- Bayesian Neural Network -- 2951 dimensional on a real data-set with 308 data points.
+## python
+The directory "python" contains the following items.
+- The directory "SVN". This provides an easy-to-use iPython application of SVN to some low-dimensional test cases.
+
+- The directory "SVOCD". This provides code for the test cases implemented in "Stein Variational Online Changepoint Detection with Applications to Hawkes Processes and Neural Networks" [ref].
