@@ -6,9 +6,11 @@ import multiprocessing
 from functools import partial
 import time
 import pandas as pd
+import datetime
+import pickle
 
-import LSTM_M2M
-from LSTM_M2M import LSTM as LSTM
+import ICML19_LSTM_M2M
+from ICML19_LSTM_M2M import LSTM as LSTM
 
 ###########################################################################################################################################
                
@@ -288,43 +290,66 @@ if __name__ == '__main__':
     pool = multiprocessing.Pool(40)
     
     # Load Bitcoin data
-    data_bitcoin = pd.read_csv("data_for_paper/bitcoin_price.txt", sep="\t")
+    data_bitcoin = pd.read_csv("bitcoin_price.txt", sep="\t")
     data_bitcoin['Timestamp2'] = pd.to_datetime(data_bitcoin['Timestamp'])
     data_bitcoin = data_bitcoin.drop(data_bitcoin.index[[22,23,24]])
     data_bitcoin["Weighted Price"] = pd.to_numeric(data_bitcoin["Weighted Price"])
     data_bitcoin['date'] = pd.to_datetime(data_bitcoin['Timestamp2'].dt.date)
-    data = data_bitcoin[379:].reset_index(drop = True)[["date", "Weighted Price"]].set_index('date').rolling(min_periods = 1, 
-                                                                   window=7).mean()["Weighted Price"].interpolate().values
-    
+    data_all = data_bitcoin[379:].reset_index(drop = True)[["date", "Weighted Price"]].set_index('date').rolling(min_periods = 1, 
+                                                                   window=7).mean()["Weighted Price"].interpolate()
+    data = data_all.values
+    days = data_all.index
+
     data -= np.mean(data)
-    data /= np.std(data)   
+    data /= np.std(data)  
   
     # Run SVOCD
     bocpd = BOCPD(data)
     bocpd.apply()
     
+#     # Save model
+#     output_file = open('bocpd_model_svn.pkl', 'wb')
+#     pickle.dump(bocpd, output_file)    
+    
     print(bocpd.changepoints)
     
-    # Plot week against scaled price and analysis
+    ### Plot ###
+    
     plt.rcParams.update({'font.size': 24})
-    fig = plt.figure(figsize = (15, 10))
-    ax = plt.subplot(1,1,1)
-    ax1 = plt.plot(data, 'b-', label = 'data')
-    ax2 = plt.plot(bocpd.pred_mean, 'r-', label = 'predicted mean')
-    ax3 = plt.plot(bocpd.percentile_r, 'g-.', label = 'credible interval')
-    plt.plot(bocpd.percentile_l, 'g-.')
-    plt.fill_between(np.arange(len(data)), bocpd.percentile_l, bocpd.percentile_r, alpha = 0.05,\
-                    color = 'g')
+
+    # Make dataframe
+    df = pd.DataFrame({'data' : data,\
+                       'predicted mean' : bocpd.pred_mean, \
+                       'credible interval' : bocpd.percentile_r, \
+                       'credible interval tmp': bocpd.percentile_l}, index = days)
+
+    # Plot day against scaled price
+    my_colours = ['b', 'r', 'g', 'g']
+    my_styles  = ['-', '-', '--', '--']
+    ax = df.plot(legend = False, figsize = (15, 10), color=my_colours, style = my_styles)
+
+    plt.fill_between(days, bocpd.percentile_l, bocpd.percentile_r, alpha = 0.05, color = 'g')
+
+
     for cp in bocpd.changepoints:
-        ax3 = plt.axvline(x = cp, color = 'r', linestyle = '--', label = 'changepoint')
-    plt.xlabel('week', fontsize = 24)
+        xvalue = days[cp]
+        ax3 = plt.axvline(x = xvalue, color = 'r', linestyle = '--', label = 'changepoint')
+    plt.xlabel('', fontsize = 24)
     plt.ylabel('scaled price', fontsize = 24)
     handles, labels = ax.get_legend_handles_labels();
-    ax.legend(handles[:4], labels[:4], loc = 'upper left', fontsize = 18)
+    ax.legend(handles[:3] + [handles[4]], labels[:3] + [labels[4]], loc = 'upper left', fontsize = 24)
     axes = plt.gca()
-    axes.set_ylim([-5,10])
+    axes.set_ylim([-0.5,4])
+
+    day_min = datetime.datetime(2017, 9, 1)
+    day_max = datetime.datetime(2018, 5, 1)
+    axes.set_xlim([day_min, day_max])
+    
+    ax.locator_params(axis='y', nbins=6)
 
     plt.show()
-    
+   
+    ### End Plot ###
+
     pool.close()
     
