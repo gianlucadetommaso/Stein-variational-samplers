@@ -8,4 +8,4 @@ The directory "MATLAB" contains the test cases implemented in "A Stein variation
 The directory "python" contains the following items.
 - The directory "SVN". This provides an easy-to-use iPython application of SVN to some low-dimensional test cases.
 
-- The directory "SVOCD". This provides code for the test cases implemented in "Stein Variational Online Changepoint Detection with Applications to Hawkes Processes and Neural Networks" [ref].
+- The directory "SVOCD". This provides code for the test cases implemented in "Stein Variational Online Changepoint Detection with Applications to Hawkes Processes and Neural Networks" https://arxiv.org/pdf/1901.07987.pdf (Detommaso et al., 2019).
