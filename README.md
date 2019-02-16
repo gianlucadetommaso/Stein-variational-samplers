@@ -2,7 +2,7 @@
 This repository contains MATLAB and python code for several Stein variational sampling algorithms. 
 
 ### MATLAB
-The directory "MATLAB" contains the test cases implemented in "A Stein variational Newton method" (SVN), https://arxiv.org/pdf/1806.03085.pdf (Detommaso et al., NIPS 2018).
+The directory "MATLAB" contains the test cases implemented in "A Stein variational Newton method" (SVN), https://arxiv.org/pdf/1806.03085.pdf (Detommaso et al., NeurIPS 2018).
 
 ### python
 The directory "python" contains the following items.
