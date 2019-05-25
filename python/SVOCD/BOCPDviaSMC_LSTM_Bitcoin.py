@@ -9,8 +9,8 @@ import pandas as pd
 import datetime
 import pickle
 
-import ICML19_LSTM_M2M
-from ICML19_LSTM_M2M import LSTM as LSTM
+import LSTM_M2M
+from LSTM_M2M import LSTM as LSTM
 
 ###########################################################################################################################################
 
